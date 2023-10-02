@@ -1,11 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import Pan from '@/components/gesture/Pan'
+import PanWithDecay from '@/components/gesture/PanWithDecay'
 
 const PanScreen = () => {
   return (
     <View style={styles.container}>
       <Pan />
+      <PanWithDecay />
     </View>
   )
 }

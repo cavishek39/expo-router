@@ -1,10 +1,9 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import React from 'react'
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  withTiming,
 } from 'react-native-reanimated'
 import {
   Gesture,
@@ -14,27 +13,39 @@ import {
 
 const Pan = () => {
   const pressed = useSharedValue(false)
-  const offset = useSharedValue(0)
+  const offset = useSharedValue({ x: 0, y: 0 })
+  const start = useSharedValue({ x: 0, y: 0 })
 
   const pan = Gesture.Pan()
     .onBegin(() => {
       pressed.value = true
     })
-    .onChange((event) => {
-      offset.value = event.translationX
+    .onUpdate((event) => {
+      offset.value = {
+        x: event.translationX + start.value.x,
+        y: event.translationY + start.value.y,
+      }
+    })
+    .onEnd(() => {
+      offset.value = {
+        x: withSpring(offset.value.x),
+        y: withSpring(offset.value.y),
+      }
     })
     .onFinalize(() => {
-      offset.value = withSpring(0)
       pressed.value = false
     })
 
-  const animatedStyles = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: offset.value },
-      { scale: withTiming(pressed.value ? 1.2 : 1) },
-    ],
-    backgroundColor: pressed.value ? '#FFE04B' : '#b58df1',
-  }))
+  const animatedStyles = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateX: offset.value.x },
+        { translateY: offset.value.y },
+        { scale: withSpring(pressed.value ? 1.2 : 1) },
+      ],
+      backgroundColor: pressed.value ? 'yellow' : 'blue',
+    }
+  })
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
